@@ -109,10 +109,8 @@ int main (){
                     if (DADOSARQUIVOS == NULL) {
                         cout << "ERRO AO ABRIR O ARQUIVO! ";
                     } else {
-                        pos = -1;
                         fread(&liv, sizeof(struct livro),1,DADOSARQUIVOS);
                         while(!feof(DADOSARQUIVOS)){
-                            pos++;
                             if(codigo_e == liv.codigo){
                                 fseek(DADOSARQUIVOS, -sizeof(struct livro), SEEK_CUR);
                                 cout << "O que voce deseja alterar? ";
