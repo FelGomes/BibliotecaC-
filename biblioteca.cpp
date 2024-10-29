@@ -1,500 +1,408 @@
-
-#include <iostream> // biblioteca principal
-#include <cstdio> // biblioteca para funcionar os arquivos
-#include <limits> // biblioteca para utilizar os numeric_limits
-#include <cstring> // serve para usar pra alterar valor de uma variavel dentro de arquivo. Ex: strcpy e strcm //
-//#include <conio.h> biblioteca para ler um caracter sem dar enter
-#include <cctype> // biblioteca para usar o tolower(deixar minusculo)
+#include <iostream>
+#include <limits>
+#include <cstdio>
+#include <cctype>
+#include <cstring>
 
 using namespace std;
 
+struct emprestimo {
+    char emprestimo[20], devolucao[20], usuario[255];
+
+};
+
+struct cadastro {
+    char autor[255], titulo[255], editora[50], area[50];
+    int codigo, qtd_pag;
+    bool disponivel = false;
+    struct emprestimo  emp;
+};
+
+struct cadastro cad;
+string escolha, nome_e;
+int opc, codigo_e;
+int pos;
+bool encontrado = false;
 void menu(){
 
-    cout << "------------------------------------- " << endl;
-    cout << "01) CADASTRO " <<endl;
-    cout << "02) ALTERAÇAO " << endl;
+    cout << "==================================" <<endl;
+    cout << "               MENU               " <<endl;
+    cout << "==================================" <<endl;
+    cout << "01) CADASTRO " << endl;
+    cout << "02) ALTERACAO " << endl;
     cout << "03) EXCLUSAO " << endl;
-    cout << "04) EMPRESTIMO " << endl;
-    cout << "05) DEVOLUCAO " << endl;
-    cout << "06) CONSULTA DE LIVRO " << endl;
-    cout << "07) LIVROS DISPONIVEIS " <<endl;
-    cout << "08) lISTAGEM DE LIVROS " << endl;
+    cout << "04) EMPRESTIMO" << endl;
+    cout << "05) DEVOLUCAO" << endl;
+    cout << "06) CONSULTA DE LIVROS " << endl;
+    cout << "07) LIVROS DISPONIVEIS" << endl;
+    cout << "08) LISTAGEM DE LIVROS " << endl;
     cout << "09) SAIR " << endl;
-    cout << "------------------------------------- " << endl;
+
 }
 
-int main (){
 
-    struct cadastro {
-        char emprestimo[15], devolucao[15], usuario[100];
+int main () {
 
-    };
-
-    struct livro {
-        char titulo [100], editora[100], autor[100], area[15];
-        int quant_pag, codigo;
-        bool liv_disponivel;
-        struct cadastro cad;
-    };
-
-    struct livro liv;
-    char opc;
-    string escolha, quero, inf_errada, resposta;
-    int codigo_e, pos, busca_exc, busca, exc;
-    int liv_disponivel = 0;
-    //bool livro_encontrado = false;  
-    FILE *DADOSARQUIVOS;
-    FILE *DADOSARQUIVOS_AUX; //Criado os arquivos auxiliar para fazer a exclusao de 1 e passar para o outro!
+    FILE *ARQUIVOSDADOS;
+    FILE *ARQUIVOSDADOS_AUX;
 
     menu();
-
-    cout << "Escolha uma opcao: ";
+    cout << "Deseja escolher qual opção? ";
     cin >> opc;
-    system("cls");
+    cin.get();
+    cout << "\e[2j" << "\e[0;0H" ;
 
-    while(opc != '9'){
+    while(opc != 9){
         switch (opc){
-                case '1':
-                    cout << "Deseja cadastrar um novo livro? ";
-                    cin >> escolha;
-                    for (char& c : escolha){
-                        c = tolower(c);
-                    }
+        case 1:
+                cout << "Deseja cadastrar um novo livro? ";
+                cin >> escolha;
 
-                    while(escolha == "sim"){
-                        DADOSARQUIVOS = fopen("arquivo.data", "ab+"); // Abre o arquivo para anexar informaçoes
-                        if(DADOSARQUIVOS == NULL){
-                            DADOSARQUIVOS = fopen("arquivo.data", "wb"); // abre para escrever do 0
-                                if(DADOSARQUIVOS == NULL){
-                                    cout << "ERRO AO ABRIR O ARQUIVO! " << endl;
-                                }
-                            
-                        } else {
-                            cout << "----------- CADASTRO ---------- " << endl;
-                            cout << "VAMOS CADASTRAR UM NOVO LIVRO " << endl;
-                            cout << "Informe o codigo do livro: ";
-                            cin >> liv.codigo;
-                            cin.get(); // Para quebrar o buffer de um int para caracter
-                            cout << "TITULO: ";
-                            cin.get(liv.titulo, 99);
-                            cin.ignore(numeric_limits<streamsize>::max(),'\n');
-                            cout << "Informe a editora do livro: ";
-                            cin.get(liv.editora, 99);
-                            cin.ignore(numeric_limits<streamsize>::max(),'\n');
-                            cout << "Informe o autor: ";
-                            cin.get(liv.autor, 99);
-                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                            cout << "Informe a area do livro: ";
-                            cin.get(liv.area, 14);
-                            cin.ignore(numeric_limits<streamsize>::max(),'\n');
-                            cout << "Informe a quantidade de pagina do livro: ";
-                            cin >> liv.quant_pag;
-                            fwrite(&liv, sizeof(struct livro),1, DADOSARQUIVOS);
-                            fclose(DADOSARQUIVOS);
-
+                for (char& c:escolha){
+                    c = tolower(c);
+                }
+                while(escolha == "sim"){
+                    ARQUIVOSDADOS = fopen("prova.dat", "ab+");
+                    if(ARQUIVOSDADOS == NULL){
+                        ARQUIVOSDADOS = fopen("prova.dat", "wb");
+                        if(ARQUIVOSDADOS == NULL){
+                            cout << "ERRO AO ABRIR O ARQUIVO! " <<endl;
                         }
-                        cout << "Deseja cadastar outro livro? ";
-                        cin >> escolha;
-                        system("cls");
-                    }
-                    break;
-                // system("cls");
-                case '2' :
-                    cout << "--------------- ALTERACAO --------------" << endl;
-                    cout << "Voce digitou uma informaçao errada ne? " << endl;
-                    cout << "Informe o codigo do livro que voce digitou errado: ";
-                    cin >> codigo_e;
-                    cin.get(); // alterado para cin.get
-                    DADOSARQUIVOS = fopen("arquivo.data", "rb+"); // abre o arquivo para ler e escrever
-                    if (DADOSARQUIVOS == NULL) {
-                        cout << "ERRO AO ABRIR O ARQUIVO! ";
+                        
                     } else {
-                        fread(&liv, sizeof(struct livro),1,DADOSARQUIVOS);
-                        while(!feof(DADOSARQUIVOS)){
-                            if(codigo_e == liv.codigo){
-                                fseek(DADOSARQUIVOS, -sizeof(struct livro), SEEK_CUR);
-                                cout << "O que voce deseja alterar? ";
-                                cin >> inf_errada;
-                                cin.get();
+                        cout << "------------------ CADASTRO --------------------" <<endl;
+                        cout << "CODIGO: ";
+                        cin >> cad.codigo;
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        cout << "TITULO: ";
+                        cin.get(cad.titulo, 254);
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        cout << "AUTOR: ";
+                        cin.get(cad.autor, 254);
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        cout << "AREA: ";
+                        cin.get(cad.area, 49);
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        cout << "EDITORA: ";
+                        cin.get(cad.editora, 49);
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        cout << "QUANTIDADE DE PAGINA: ";
+                        cin >> cad.qtd_pag;
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        fwrite(&cad, sizeof(struct cadastro),1,ARQUIVOSDADOS);
+                        cout << "LIVRO CADASTRADO COM SUCESSO! " <<endl;
+                        fclose(ARQUIVOSDADOS);
+                    }
 
-                                //for (char &c : inf_errada) {
-                                //    c = tolower(c); // transforma a resposta para minusculo
-                                //}
-
-                                if(inf_errada == "tudo"){
-                                    cout << "Voce esta de sacanagem? " << endl;
-                                    cout << "VAMOS LA ENT... " << endl;
-                                    cout << "TITULO: ";
-                                    cin.get(liv.titulo, 99);
-                                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                                    cout << "EDITORA: ";
-                                    cin.get(liv.editora, 99);
-                                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                                    cout << "Informe o autor: ";
-                                    cin.get(liv.autor, 99);
-                                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                                    cout << "Informe a area do livro: ";
-                                    cin.get(liv.area, 14);
-                                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                                    cout << "Informe a quantidade de pagina do livro: ";
-                                    cin >> liv.quant_pag;
-                                    cin.get();
-                                    fwrite(&liv, sizeof(struct livro), 1, DADOSARQUIVOS);
-                                    fclose(DADOSARQUIVOS);
-                                    break;
-
-                                }else if(inf_errada == "titulo"){
-                                    cout << "NOVO TITULO: ";
-                                    cin.get(liv.titulo, 99);
-                                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                                    fwrite(&liv, sizeof(struct livro), 1, DADOSARQUIVOS);
-                                    fclose(DADOSARQUIVOS);
-                                    break;
-
-                                }else if(inf_errada == "autor"){
-                                    cout << "AUTOR: ";
-                                    cin.get(liv.autor, 99);
-                                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                                    fwrite(&liv, sizeof(struct livro), 1, DADOSARQUIVOS);
-                                    fclose(DADOSARQUIVOS);
-                                    break;
-
-                                }else if(inf_errada == "editora"){
-                                    cout << "EDITORA: ";
-                                    cin.get(liv.editora, 99);
-                                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                                    fwrite(&liv, sizeof(struct livro), 1, DADOSARQUIVOS);
-                                    fclose(DADOSARQUIVOS);
-                                    break;
-
-                                }else if(inf_errada == "area"){
-                                    cout << "AREA: ";
-                                    cin.get(liv.area, 14);
-                                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                                    fwrite(&liv, sizeof(struct livro), 1, DADOSARQUIVOS);
-                                    fclose(DADOSARQUIVOS);
-                                    break;
-
-                                }else if(inf_errada == "pagina"){
-                                    cout << "QUANTIDADE DE PAGINAS: ";
-                                    cin >> liv.quant_pag;
-                                    fwrite(&liv, sizeof(struct livro), 1, DADOSARQUIVOS);
-                                    fclose(DADOSARQUIVOS);
-                                    break;
-                                }else{
-                                    cout << "digitou errado!!" << endl;
-                                    cin.get();
-                                    break;
-                                }
-                            }
-                            fread(&liv, sizeof(struct livro),1,DADOSARQUIVOS);
-                        }  
-                        //fclose(DADOSARQUIVOS);  // Fecha o arquivo após todas as operações
-                        cout << "DE ENTER PARA SAIR: ";
+                    cout << "Deseja cadastar outro livro? ";
+                    cin >> escolha;
+                }
+            break;
+        case 2:
+            cout << "================================================" <<endl;
+            cout << "                  ALTERACAO                     " << endl;
+            cout << "================================================" <<endl;
+            cout << "Deseja fazer uma alteracao? ";
+            cin >> escolha;
+            for (char& c:escolha){
+                c = tolower(c);
+            }
+            while(escolha == "sim"){
+                        cout << "Informe o codigo que voce digitou errado: ";
+                        cin >> codigo_e;
                         cin.get();
-                        system("cls");
-                    }
-                    break;
-
-                case '3':
-                    cout << "====================================" <<endl;
-                    cout << "             EXCLUSAO               " << endl;
-                    cout << "====================================" <<endl;
-                    cout << "Deseja fazer uma exlcusao? ";
-                    cin >> escolha;
-                    for(char& c : escolha) {
-                        c = tolower(c);
-                    }
-                    while(escolha == "sim"){
-                        cout << "Deseja excluir tudo? 1 p/s e qualquer outro numero para nao" << endl;
-                        cin >> exc;
-                        if(exc == 1){
-                            DADOSARQUIVOS = fopen("arquivo.data", "wb");
-                            cout << "Arquivo excluido!!" << endl;
+                        ARQUIVOSDADOS = fopen("prova.dat", "rb+");
+                        if(ARQUIVOSDADOS == NULL){
+                            cout << "ERRO AO ABRIR O ARQUIVO!";
                             
-                        }else{
-                            cout << "Informe o codigo do livro para exclusao: ";
-                            cin >> busca_exc;
-                            cin.get();
-                            DADOSARQUIVOS_AUX = fopen("arquivo.data.aux", "wb"); //abre um novo para sobrescrever
-                            DADOSARQUIVOS =  fopen("arquivo.data", "rb"); // abre o principal para leitura
-                            if (DADOSARQUIVOS == NULL || DADOSARQUIVOS_AUX == NULL){
-                                cout << "ERRO AO ABRIR O(S) ARQUIVO(S)! " << endl; 
-                            } else {
-                                fread(&liv, sizeof(struct livro),1,DADOSARQUIVOS);
-                                while(fread(&liv, sizeof(struct livro),1,DADOSARQUIVOS)==1){
-                                   if(busca_exc != liv.codigo){
-                                       fwrite(&liv, sizeof(struct livro),1, DADOSARQUIVOS_AUX);
-                                    }
-                                   
-                                }
-                                fclose(DADOSARQUIVOS_AUX);
-                                fclose(DADOSARQUIVOS);
-                                remove("arquivo.data");
-                                rename("arquivo.data.aux","arquivo.data");
-                                cout << "ARQUIVO EXLCUIDO COM SUCESSO! "<<endl;
-                                cin.get();
-                            
-                            }
-                        cout << "Deseja fazer exclusao de outro arquivo? ";
-                        cin >> escolha;
-
-                        }
-
-                        for (char& c : escolha){
-                            c = tolower (c);
-                        }
-                        system("cls");
-                    }
-
-                    break;
-                case '4':
-                    cout << "Deseja pegar um livro emprestado? ";
-                    cin >> quero;
-                    for (char& c : quero) {
-                        c = tolower(c);
-                    }
-
-                    while (quero == "sim"){
-                        cout << "Informe o codigo do livro que deseja pegar emprestado: ";
-                        cin >> codigo_e;
-                        DADOSARQUIVOS = fopen("arquivo.data", "rb+");
-                        if(DADOSARQUIVOS == NULL){
-                            cout << "ERRO AO ABRIR O ARQUIVO! ";
                         } else{
-                            while (fread(&liv, sizeof(struct livro), 1, DADOSARQUIVOS) == 1) {
-                                if (liv.codigo == codigo_e ) {
-                                    cout << "NOME do usuário: ";
-                                    cin.ignore(numeric_limits<streamsize>::max(),'\n');  // Limpar o buffer de entrada
-                                    cin.getline(liv.cad.usuario, 99);
-                                    cin.ignore(numeric_limits<streamsize>::max(),'\n');
-                                    cout << "DATA DE EMPRESTIMO: ";
-                                    cin.getline(liv.cad.emprestimo, 99);
-                                    cin.ignore(numeric_limits<streamsize>::max(),'\n');
-                                    cout << "DATA DE DEVOLUCAO: ";
-                                    cin.getline(liv.cad.devolucao, 99);
-                                    cin.ignore(numeric_limits<streamsize>::max(),'\n');
-                                    liv.liv_disponivel = false;
-                                    fseek(DADOSARQUIVOS, sizeof(struct livro) * pos, SEEK_SET);
-                                    fwrite(&liv, sizeof(struct livro), 1, DADOSARQUIVOS);
-                                    liv.liv_disponivel = false;
-                                    if (fwrite(&liv, sizeof(struct livro),1,DADOSARQUIVOS)==1){
-                                        cout << "Livros emprestado com sucesso! " << endl;
-                                    } else{
-                                        cout << "ERRO AO FAZER O EMPRESTIMO!";
-                                    }
-                                }
-                            } fclose(DADOSARQUIVOS);
-                        }
-
-                        cout << "Deseja pegar outro livro emprestado? ";
-                        cin >> quero;
-                    }
+                            pos = -1;
+                            while(fread(&cad, sizeof(struct cadastro),1,ARQUIVOSDADOS)==1){
                                 
-                break;
+                              pos++;
+                                if(codigo_e == cad.codigo){
+                                    cout << "TITULO: ";
+                                    cin.get(cad.titulo, 254);
+                                    cin.ignore(numeric_limits<streamsize>::max(),'\n');
+                                    cout << "AUTOR: ";
+                                    cin.get(cad.autor, 254);
+                                    cin.ignore(numeric_limits<streamsize>::max(),'\n');
+                                    cout << "EDITORA: ";
+                                    cin.get(cad.editora, 49);
+                                    cin.ignore(numeric_limits<streamsize>::max(),'\n');
+                                    cout << "AREA: ";
+                                    cin.get(cad.area, 49);
+                                    cin.ignore(numeric_limits<streamsize>::max(),'\n');
+                                    cout << "QUANTIDADE DE PAGINA: ";
+                                    cin >> cad.qtd_pag;
+                                    cin.ignore(numeric_limits<streamsize>::max(),'\n');
+                                    fseek(ARQUIVOSDADOS, sizeof(struct cadastro)*pos, SEEK_SET);
+                                    if(fwrite(&cad, sizeof(struct cadastro), 1, ARQUIVOSDADOS)==1){
+                                        cout << "ALTERACAO FEITA COM SUCESSO! " << endl;
+                                    } else{
+                                        cout << "Nao foi cadastrado! " << endl;
+                                        break;
+                                    }
 
-                case '5':
-                    cout <<"---------------------------- " << endl;
-                    cout << "         DEVOLUCAO          " << endl;
-                    cout << "--------------------------- " << endl;
-                    cout << "Voce deseja devolver o livro? ";
-                    cin >> escolha;
-
-                    for (char& c : escolha){
-                        c = tolower(c);
-                    }
-                    while(escolha == "sim"){
-                        cout << "Informe o codigo do livro que deseja devolver: ";
-                        cin >> codigo_e;
-                        DADOSARQUIVOS = fopen("arquivo.data", "rb+"); //criado para abrir e escrever
-                        if(DADOSARQUIVOS == NULL){
-                            cout << "ERRO AO ABRIR O ARQUIVO! ";
-                        }else{
-                            bool encontrado = false;
-                            while( fread(&liv, sizeof(struct cadastro),1,DADOSARQUIVOS)==1){
-                                if(liv.codigo == codigo_e){
-                                    encontrado = true;
-                                    strcpy(liv.cad.usuario, ""); // strcpy copiar o valor dps da virgula pro campo anterior
-                                    strcpy(liv.cad.emprestimo, "");
-                                    strcpy(liv.cad.devolucao, "");
-                                    liv.liv_disponivel = true;
-                                    fseek(DADOSARQUIVOS, -sizeof(struct livro), SEEK_CUR);
-                                    fwrite(&liv, sizeof(struct livro),1,DADOSARQUIVOS);
-                                    cout << "Devolucao feita com sucesso! \n";
+                                    cout << "DE ENTER PARA SAIR: " << endl;
+                                    cin.get();
+                                    fclose(ARQUIVOSDADOS);
                                     break;
                                 }
-                
-                            } fclose(DADOSARQUIVOS);
-                            if (!encontrado){
-                                cout << "LIVRO NAO ENCONTRADO! " << endl;
                             }
-                            cout << "De enter para sair: ";
-                            cin.get();
-                            system("cls");
-            
-                        } 
-                            cout << "Deseja devolver outro livro? ";
-                            cin >> escolha;
-        
-                            for(char& c : escolha){
-                                c = tolower(c);
-                            }
-                    }
-                    break;
-
-                case '6':
-                    cout << "--------------------------------------------- "<<endl;
-                    cout << "              CONSULTA DE LIVROS              " << endl;
-                    cout << "--------------------------------------------- "<<endl;
-                    cout << "Voce deseja consultar um livro? ";
+                        }
+                    cout << "DESEJA FAZER UMA OUTRA ALTERACAO? ";
                     cin >> escolha;
                     for(char& c:escolha){
                         c = tolower(c);
                     }
-                    while(escolha == "sim"){
-                        cout << "Voce deseja cadastrar por codigo ou por posicao? ";
-                        cin >> resposta;
-                        for(char & c:resposta){
-                            c = tolower (c);
+                }
+
+            break;
+
+        case 3:
+            cout << "============================================== " << endl;
+            cout << "                    EXCLUSAO                   " << endl;
+            cout << "============================================== " << endl;
+            cout << "Deseja fazer a exclusao do livro? ";
+            cin >> escolha;
+            while(escolha == "sim") {
+                cout << "Informe o codigo que voce deseja excluir: ";
+                cin >> codigo_e;
+                cin.get();
+                ARQUIVOSDADOS_AUX = fopen("prova.dat.aux", "wb");
+                ARQUIVOSDADOS = fopen("prova.dat", "rb");
+                if (ARQUIVOSDADOS == NULL || ARQUIVOSDADOS_AUX == NULL){
+                    cout << "ERRO AO ABRIR O(s) ARQUIVO(s)!" <<endl;
+
+                } else{
+                    while(fread(&cad, sizeof(struct cadastro),1,ARQUIVOSDADOS)==1){
+                        if(cad.codigo != codigo_e){
+                            fwrite(&cad, sizeof(struct cadastro),1,ARQUIVOSDADOS_AUX);
                         }
-                        if(resposta == "codigo"){
-                            cout << "Informe o codigo do livro: ";
-                            cin >> codigo_e;
-                            DADOSARQUIVOS =  fopen("arquivo.data", "rb");
-                            if(DADOSARQUIVOS == NULL){
-                                cout << "ERRO AO ABRIR O ARQUIVO! ";
-                            }else {
-                                cout << "ARQRUIVO ABERTO COM SUCESSO! "<< endl;
-                                while (fread(&liv, sizeof(struct livro), 1, DADOSARQUIVOS)==1){
-                                    if(liv.codigo == codigo_e){
-                                        cout << "Titulo: " << liv.titulo << endl;
-                                        cout << "AUTOR: " << liv.autor << endl;
-                                        cout << "EDITORA: " << liv.editora << endl;
-                                        cout << "CODIGO: " << liv.codigo << endl;
-                                        cout << "QUANTIDADE DE PAGINA: " <<liv.quant_pag << endl;
-                                        cout << "AREA: " << liv.area << endl;
-                                        if (liv.liv_disponivel == true){
-                                            cout << "LIVRO DISPONIVEL! " << endl;
 
-                                        } else {
-                                            cout << "LIVRO EMPRESTADO! " << endl;
-                                            cout << "USUARIO: " << liv.cad.usuario << endl;
-                                            cout << "EMPRESTIMO: " << liv.cad.emprestimo << endl;
-                                            cout << "DEVOLUCAO: " << liv.cad.devolucao << endl;
-                                        }
-                                    } else{
-                                        cout << "livro nao encontrado! ";
-                                    }
-                                
-                            
-                                fclose(DADOSARQUIVOS);   
-                                }
-                            }
-
-                        } else if (resposta == "posicao!"){
-                            DADOSARQUIVOS = fopen("arquivo.data", "rb");
-                            if(DADOSARQUIVOS == NULL){
-                                cout << "ERRO AO ABRIR O ARQUIVO! ";
-
-                            } else{
-                                cout << "informe a posicao que voce deseja saber? ";
-                                cin >> busca;
-                                while(fread(&liv, sizeof(struct livro),1, DADOSARQUIVOS)==1){
-                                    fseek(DADOSARQUIVOS, sizeof(struct livro)*busca, SEEK_SET);
-                                    cout << "Titulo: " << liv.titulo << endl;
-                                    cout << "AUTOR: " << liv.autor << endl;
-                                    cout << "EDITORA: " << liv.editora << endl;
-                                    cout << "CODIGO: " << liv.codigo << endl;
-                                    cout << "QUANTIDADE DE PAGINA: " <<liv.quant_pag << endl;
-                                    cout << "AREA: " << liv.area << endl;
-                                    if (liv.liv_disponivel == true){
-                                            cout << "LIVRO DISPONIVEL! " << endl;
-
-                                    } else {
-                                        cout << "LIVRO EMPRESTADO! " << endl;
-                                        cout << "USUARIO: " << liv.cad.usuario << endl;
-                                        cout << "EMPRESTIMO: " << liv.cad.devolucao << endl;
-                                        cout << "DEVOLUCAO: " << liv.cad.devolucao << endl;
-                                    }
-                                }
-                                fclose(DADOSARQUIVOS);
-                                cout << "DE ENTER PARA SAIR: ";
-                                cin.get();
-                            }
-                        }
-                        cout << "DESEJA CONSULTAR OUTRO LIVRO? ";
-                        cin >> escolha;
-                        for(char& c:escolha){
-                            c = tolower(c);
-                        }
                     }
-                    break;
+                    fclose(ARQUIVOSDADOS_AUX);
+                    fclose(ARQUIVOSDADOS);
+                    remove("prova.dat");
+                    rename("prova.dat.aux", "prova.dat");
+                    cout << "ARQUIVO EXCLUIDO! ";
+                    cin.ignore();
+                    
+                }
+                cout << "Deseja fazer outra exclusao? ";
+                cin >> escolha;
+                for(char& c:escolha){
+                    c = tolower(c);
+                }
+                
+            }
+            break;
+        case 4: 
+                cout << "============================================"<<endl;
+                cout << "                EMPRESTIMO                  " <<endl;
+                cout << "============================================"<<endl;
+                cout << "Deseja fazer um emprestimo? ";
+                cin >> escolha;
 
-                case '7':
-                    cout << "------------------------------------------- " << endl;
-                    cout << "            LIVRO DISPONIVEIS               " <<endl;
-                    cout << "------------------------------------------- " << endl;
-                    DADOSARQUIVOS = fopen("arquivo.data", "rb");
-                    if(DADOSARQUIVOS == NULL){
-                        cout << "ERRO AO ABRIR O ARQUIVO! ";
+                for (char& c: escolha){
+                    c = tolower(c);
+                }
+                while(escolha == "sim"){
+                    cout << "Informe o codigo do livro: ";
+                    cin >> codigo_e;
+                    cin.get();
+                    ARQUIVOSDADOS = fopen("prova.dat", "rb+");
+                    if(ARQUIVOSDADOS == NULL){
+                        cout << "ERRO AO ABRIR O ARQUIVO! " << endl;
+
                     } else{
-                        pos = -1;
-                        fread(&liv, sizeof(struct livro),1, DADOSARQUIVOS);
-                        while(fread(&liv, sizeof(struct livro),1, DADOSARQUIVOS)==1){
-                            if(liv.liv_disponivel == true){
-                                fseek(DADOSARQUIVOS, sizeof(struct livro)*pos,SEEK_SET);
-                                cout << "--------------------------------";
-                                cout << "Titulo: " << liv.titulo << endl;
-                                cout << "AUTOR: " << liv.autor << endl;
-                                cout << "EDITORA: " << liv.editora << endl;
-                                cout << "CODIGO: " << liv.codigo << endl;
-                                cout << "QUANTIDADE DE PAGINA: " <<liv.quant_pag << endl;
-                                cout << "AREA: " << liv.area << endl;
-                                cout << "--------------------------------------------" << endl;
-                                liv_disponivel++;
+                        while(fread(&cad, sizeof(struct cadastro),1, ARQUIVOSDADOS)==1){
+                            if(cad.codigo == codigo_e){
+                                fseek(ARQUIVOSDADOS, -sizeof(struct cadastro), SEEK_CUR);
+                                cout << "NOME: ";
+                                cin.get(cad.emp.usuario, 254);
+                                cin.ignore(numeric_limits<streamsize>::max(),'\n');
+                                cout << "DATA EMPRESTIMO: ";
+                                cin.get(cad.emp.emprestimo,19);
+                                cin.ignore(numeric_limits<streamsize>::max(),'\n');
+                                cout << "DATA DEVOLUCAO: ";
+                                cin.get(cad.emp.devolucao, 19);
+                                cin.ignore(numeric_limits<streamsize>::max(),'\n');
+                                cad.disponivel = false;
+                                if(fwrite(&cad, sizeof(struct cadastro),1, ARQUIVOSDADOS)==1){
+                                    cout << "EMPRESTIMO FEITO!" << endl;
+                                } else{
+                                    cout << "ERRO!"<<endl;
+                                }
                             }
-                            cout << "Existe " << liv_disponivel << " livros disponiveis! " << endl;
                         }
-                        fclose(DADOSARQUIVOS);
-                        cout << "DE ENTER PARA SAIR: ";
-                        cin.get();
+                    }fclose(ARQUIVOSDADOS);
+                    cout << "Deseja fazer um emprestimo? ";
+                    cin >> escolha;
+
+                    for(char& c:escolha){
+                        c = tolower (c);
                     }
-
-                    break;
-
-                case '8':
-                    cout << "-------------LIVRO CADASTRADO ----------- " << endl;
-                    DADOSARQUIVOS = fopen("arquivo.data", "rb");
-                    if(DADOSARQUIVOS == NULL){
-                        cout << "ERRO AO ABRIR PARA LEITURA! ";
-                    } else {
-                        fread(&liv,sizeof(struct livro),1, DADOSARQUIVOS);
-                        while(!feof(DADOSARQUIVOS)){
-                            cout << "CODIGO: " << liv.codigo << endl;
-                            cout << "TITULO: " << liv.titulo << endl;
-                            cout << "AUTOR: " << liv.autor << endl;
-                            cout << "EDITORA: " <<liv.editora << endl;
-                            cout << "AREA: " <<liv.area << endl;
-                            cout << "Quantidade de paginas: " << liv.quant_pag << endl;
-                            cout << "-----------------------------------------------------" << endl;
-                            fread(&liv, sizeof(struct livro),1,DADOSARQUIVOS);
-                                                       
+                }
+            break;
+        case 5:
+            cout << "=========================================" <<endl;
+            cout << "                DEVOLUCAO                " <<endl;
+            cout << "=========================================" <<endl;
+            cout << "Deseja fazer uma devolucao? ";
+            cin >> escolha;
+            for(char& c:escolha){
+                c = tolower(c);
+            }
+            while(escolha == "sim"){
+                cout << "Informe o codigo do livro: ";
+                cin >> codigo_e;
+                ARQUIVOSDADOS = fopen("prova.dat", "rb+");
+                if(ARQUIVOSDADOS == NULL){
+                    cout << "ERRO AO ABRIR O ARQUIVO! ";
+                } else{
+                    while(fread(&cad, sizeof(struct cadastro),1,ARQUIVOSDADOS)==1){
+                        fseek(ARQUIVOSDADOS, -sizeof(struct cadastro), SEEK_CUR);
+                        strcpy(cad.emp.usuario, "");
+                        strcpy(cad.emp.emprestimo, "");
+                        strcpy(cad.emp.devolucao, "");
+                        encontrado = true;
+                        if(fwrite(&cad, sizeof(struct cadastro),1,ARQUIVOSDADOS)==1){
+                            cout << "DEVOLUCAO FEITA COM SUCESSO!" <<endl;
+                        } else{
+                            cout << "ERRO AO FAZER A DEVOLUCAO! " << endl;
                         }
-                        fclose(DADOSARQUIVOS);
-                        cout << "De enter para sair: ";
-                        cin.get();
-                        cin.get();
+                            
+                        break;
+                    } fclose(ARQUIVOSDADOS);
+                    
+                } if(!encontrado){
+                    cout << "ESSE LIVRO NAO EXISTE! " << endl;
+                }
+                cout << "Deseja fazer outra devolucao? ";
+                cin >> escolha;
+                for(char& c:escolha){
+                    c = tolower(c);
+                }
+            }
+            break;
+        case 6:
+            cout << "=================================================" <<endl;
+            cout << "                    CONSULTA                     " <<endl;
+            cout << "=================================================" <<endl;
+            cout << "Deseja fazer uma consulta de livros? ";
+            cin >> escolha;
+            for (char& c:escolha){
+                c = tolower(c);
+            }
+            while(escolha == "sim"){
+                cout << "Informe o codigo do livro que deseja consultar: ";
+                cin >> codigo_e;
+                cin.get();
+                ARQUIVOSDADOS = fopen("prova.dat", "rb");
+                if(ARQUIVOSDADOS == NULL){
+                    cout << "ERRO AO ABRIR O ARQUIVO! ";
+                }else{
+                    while(fread(&cad, sizeof(struct cadastro),1,ARQUIVOSDADOS)==1){
+                        if (codigo_e == cad.codigo){
+                            cout << "CODIGO: " << cad.codigo << endl;
+                            cout << "TITULO: " << cad.titulo << endl;
+                            cout << "AUTOR: " << cad.autor << endl;
+                            cout << "EDITORA: " << cad.editora << endl;
+                            cout << "AREA: "<< cad.area << endl;
+                            cout << "QUANTIDADE DE PAGINA: " <<cad.qtd_pag <<endl;
+                            cout << "-----------------------------" << endl;
+                        }
+                        if(cad.disponivel == false){
+                            cout << "ESTA EMPRESTADO!" << endl;
+                            cout << "Nome: " << cad.emp.usuario << endl;
+                            cout << "EMPRESTADO: " << cad.emp.emprestimo << endl;
+                            cout << "DEVOLUCAO: "<< cad.emp.devolucao << endl;
+                        } else if (cad.disponivel == true){
+                            cout << "Disponivel! " << endl;
+                            }
                     }
+                }fclose(ARQUIVOSDADOS);
+                cout << "Deseja fazer consulta de outro livro? ";
+                cin >> escolha;
 
-                    break;
-                default:
-                    cout << "Valor incorreto" << endl;
-                    break;
+                for (char& c:escolha){
+                    c =tolower (c);
+                }
+            }
+            break;
+        case 7:
+            cout << "=================================" <<endl;
+            cout << "       LIVROS DISPONIVEIS        " <<endl;
+            cout << "=================================" <<endl;
+            cout << "Deseja ver os livros disponiveis? ";
+            cin >> escolha;
+
+            while(escolha == "sim"){
+                ARQUIVOSDADOS = fopen("prova.dat", "rb");
+                if (ARQUIVOSDADOS == NULL){
+                    cout << "ERRO AO ABRIR O ARQUIVO! " << endl;
+                }else{
+                    while(fread(&cad, sizeof(struct cadastro),1,ARQUIVOSDADOS)==1){
+                        if(cad.disponivel == true){
+                            cout << "CODIGO: " << cad.codigo << endl;
+                            cout << "TITULO: " << cad.titulo << endl;
+                            cout << "AUTOR " << cad.autor << endl;
+                            cout << "EDITORA: " << cad.editora << endl;
+                            cout << "AREA: " << cad.area << endl;
+                            cout << "Quantidade de pagina: " << cad.qtd_pag << endl;
+                            cout << "------------------------------------------- " << endl;
+                        }
+                    }
+                    cin.ignore();
+                    fclose(ARQUIVOSDADOS);
+                }
+
+                cout << "Deseja ver os livros disponiveis denovo? ";
+                cin >> escolha;
+
+                for (char& c:escolha){
+                    c = tolower (c);
+                }
+            }
+            break;
+        case 8:
+                cout << "==========================================" <<endl;
+                cout << "              LIVROS CADASTRADOS          " <<endl;
+                cout << "==========================================" <<endl;
+                ARQUIVOSDADOS = fopen("prova.dat", "rb");
+                if(ARQUIVOSDADOS == NULL){
+                    cout << "ERRO AO ABRIR O ARQUIVO!" << endl;
+
+                } else{
+                    fread(&cad, sizeof(struct cadastro),1,ARQUIVOSDADOS);
+                    while(!feof(ARQUIVOSDADOS)){
+                        cout << "CODIGO: " << cad.codigo << endl;
+                        cout << "TITULO: " << cad.titulo << endl;
+                        cout << "AUTOR: " << cad.autor << endl;
+                        cout << "EDITORA: " << cad.editora << endl;
+                        cout << "AREA: "<< cad.area << endl;
+                        cout << "QUANTIDADE DE PAGINA: " <<cad.qtd_pag <<endl;
+                        cout << "-----------------------------" << endl;
+                        fread(&cad, sizeof(struct cadastro),1, ARQUIVOSDADOS);
+                    }
+                    fclose(ARQUIVOSDADOS);
+                    cin.ignore();
+                    cout << "DE ENTER PARA SAIR: " << endl;
+                }
+
+            break;
+        
+        default:
+            cout << "Informe um opçao valida! " << endl;
+            break;
         }
-        system("cls");
         menu();
-        cout << "Deseja escolher qual opcao? ";
+        cout << "Deseja escolher qual opção? " << endl;
         cin >> opc;
-        system("cls");
+        cin.get();
+        cout << "\e[2j" << "\e[0;0H" ;
+
     }
 }
