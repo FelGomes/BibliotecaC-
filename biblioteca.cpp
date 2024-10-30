@@ -22,7 +22,7 @@ struct cadastro cad;
 string escolha, nome_e;
 int opc, codigo_e;
 int pos;
-bool encontrado = false;
+bool encontrado = true;
 void menu(){
 
     cout << "==================================" <<endl;
@@ -50,7 +50,7 @@ int main () {
     cout << "Deseja escolher qual opção? ";
     cin >> opc;
     cin.get();
-    cout << "\e[2j" << "\e[0;0H" ;
+    cout << "\e[2J" << "\e[0;0H" ;
 
     while(opc != 9){
         switch (opc){
@@ -268,6 +268,7 @@ int main () {
                         strcpy(cad.emp.emprestimo, "");
                         strcpy(cad.emp.devolucao, "");
                         encontrado = true;
+                        cad.disponivel = true;
                         if(fwrite(&cad, sizeof(struct cadastro),1,ARQUIVOSDADOS)==1){
                             cout << "DEVOLUCAO FEITA COM SUCESSO!" <<endl;
                         } else{
@@ -402,7 +403,7 @@ int main () {
         cout << "Deseja escolher qual opção? " << endl;
         cin >> opc;
         cin.get();
-        cout << "\e[2j" << "\e[0;0H" ;
+        cout << "\e[2J" << "\e[0;0H" ;
 
     }
 }
